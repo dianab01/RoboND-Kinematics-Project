@@ -1,0 +1,6 @@
+# CalculateIK.srv file
+# request
+geometry_msgs/Pose[] poses
+---
+# response
+trajectory_msgs/JointTrajectoryPoint[] points
