@@ -105,7 +105,6 @@ def test_code(test_case):
     
     #
     # Create individual transformation matrices
-    #print("Individual transformation matrices")
     T0_1 = DH_TransformationMatrix(alpha0, a0, d1, q1).subs(s)
     T1_2 = DH_TransformationMatrix(alpha1, a1, d2, q2).subs(s)
     T2_3 = DH_TransformationMatrix(alpha2, a2, d3, q3).subs(s)
@@ -118,11 +117,8 @@ def test_code(test_case):
 
     #
     # Extract rotation matrices from the transformation matrices
-    #print("\nRotation matrices")
    
     #T_final = simplify(T0_G * R_corr)
-    #
-    #
 
 # Extract end-effector position and orientation from request
 # px,py,pz = end-effector position
@@ -149,10 +145,8 @@ def test_code(test_case):
                     [ sin(y),  cos(y),     0],
                     [ 0,            0,     1]]) #Yaw
 
-    ### Your IK code here
-    #print("\nIK code start")
+    ### IK code 
     # Compensate for rotation discrepancy between DH parameters and Gazebo
-    #print("\nCompensate fro roation discrepancy")
     Rot_G = Rot_z * Rot_y * Rot_x
 
     Rot_err = Rot_z.subs(y, pi) * Rot_y.subs(p, -pi/2.) #simplify(R_z * R_y)
@@ -161,7 +155,7 @@ def test_code(test_case):
     Rot_G = Rot_G.subs({'r': roll, 'p': pitch, 'y': yaw})
 
     G_pos = Matrix([[px], [py], [pz]])
-    #wrist center coords
+    # Wrist center coords
     wc = G_pos - d7_val*Rot_G[:,2]
 
     #l = d5 + d6 + d7
@@ -172,25 +166,21 @@ def test_code(test_case):
     #w_z = (pz - l * n[3]).subs(s)
 #
 # Calculate joint angles using Geometric IK method
-    #print("\nthata1")
     theta1 = atan2(wc[1], wc[0])
 
 #Calculate theta2 based on the triangle formed by origins of joints 2, 3 and the wrist center
   #Side of the triangle are:
-    #A is the length of link 2, plus the offset
     A_side = sqrt(a3_val * a3_val + d4_val * d4_val) #1.501
-    #C is lenth of link 2
+    
     C_side = a2_val #1.25
-    #r_c = (sqrt(pow(wc[0], 2) + pow(wc[1], 2)) - a1).subs(s)
-    #s_c = (wc[2] - d1).subs(s)
+    
     B_side = sqrt(pow((sqrt(wc[0]*wc[0] + wc[1]*wc[1]) - a1_val), 2) + pow((wc[2] - d1_val), 2))#sqrt(r_c**2 + s_c**2)
   #Triangle's angles
     a_angle = acos((B_side*B_side + C_side*C_side - A_side*A_side) / (2*B_side*C_side))
     b_angle = acos((A_side*A_side + C_side*C_side - B_side*B_side) / (2*A_side*C_side))
 
-    #print("\nthata2")
     theta2 = pi/2 - a_angle - atan2(wc[2] - d1_val, sqrt(wc[0]*wc[0] + wc[1]*wc[1]) - a1_val)
-    #the sign of the 
+    
     theta3 = pi/2 - b_angle - atan2(np.abs(a3_val), d4_val)
 
     #Rotation matrix from base link to the third link
